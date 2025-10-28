@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Popups Manus</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;padding:24px;background:#f6f7fb}
+  .wrap{max-width:760px;margin:0 auto}
+  h1{font-size:18px;margin:0 0 12px}
+  p{margin:8px 0}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  button{
+    cursor:pointer;border:0;border-radius:8px;padding:10px 14px;
+    background:#0d6efd;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)
+  }
+  button:hover{background:#0b5ed7}
+  .hint{font-size:12px;color:#444}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ouverture en popup (déplaçable, redimensionnable)</h1>
+  <p>Chaque bouton ouvre une nouvelle fenêtre avec une taille initiale fixe, mais <strong>déplaçable</strong> et <strong>redimensionnable</strong>.</p>
+
+  <div class="row">
+    <button onclick="openPopup('view')">Ouvrir : Vue</button>
+    <button onclick="openPopup('control')">Ouvrir : Contrôle</button>
+    <button onclick="openBoth()">Ouvrir les deux</button>
+  </div>
+
+  <p class="hint">Si rien ne s’ouvre, autorise les popups pour ce site.</p>
+  <p class="hint">Astuce: tu peux régler la taille par défaut ci-dessous.</p>
+</div>
+
+<script>
+  // Taille par défaut. Modifie si besoin.
+  const DEFAULT_WIDTH  = 1400;
+  const DEFAULT_HEIGHT = 900;
+
+  // Liens fournis
+  const URLS = {
+    view: "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/view/5VL1HVS4",
+    control: "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/presenter/control/1"
+  };
+
+  function centerPos(w, h){
+    const sw = window.screen.availWidth  || window.screen.width;
+    const sh = window.screen.availHeight || window.screen.height;
+    const left = Math.max(0, Math.round((sw - w)/2));
+    const top  = Math.max(0, Math.round((sh - h)/2));
+    return {left, top};
+  }
+
+  function features(width, height){
+    const pos = centerPos(width, height);
+    // Fenêtre redimensionnable et avec barres de défilement
+    return `width=${width},height=${height},left=${pos.left},top=${pos.top},` +
+           `resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no`;
+  }
+
+  function openPopup(which){
+    const url = URLS[which];
+    const feat = features(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    const ref = window.open(url, `popup_${which}`, feat);
+    if(!ref){
+      alert("Active les popups dans ton navigateur pour ce site.");
+      return;
+    }
+    // Optionnel: donne le focus immédiatement
+    ref.focus();
+  }
+
+  function openBoth(){
+    openPopup('view');
+    // Décale légèrement la seconde fenêtre pour éviter la superposition parfaite
+    setTimeout(() => openPopup('control'), 150);
+  }
+</script>
+</body>
+</html>
