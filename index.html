@@ -3,21 +3,33 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Vue & Contrôle côte à côte</title>
+<title>Vue & Contrôle</title>
 <style>
   body {
     margin: 0;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    background: #f6f7fb;
+    background: #101218;
     display: flex;
     flex-direction: column;
     height: 100vh;
   }
-  header {
-    padding: 8px;
+  .controls {
     background: #0d6efd;
-    color: #fff;
-    text-align: center;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .controls button {
+    border: none;
+    border-radius: 4px;
+    background: #fff;
+    color: #0d6efd;
+    font-size: 12px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .controls button:hover {
+    background: #e9ecef;
   }
   main {
     flex: 1;
@@ -26,17 +38,30 @@
   }
   .pane {
     position: relative;
-    height: 100%;
+    overflow: hidden;
   }
   .pane iframe {
     width: 100%;
     height: 100%;
     border: none;
+    transform-origin: center center;
+  }
+  .zoom {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.3);
+    padding: 4px;
+    border-radius: 6px;
+  }
+  input[type="range"] {
+    width: 100%;
   }
   .close-btn {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 5px;
+    right: 5px;
     background: rgba(255, 0, 0, 0.8);
     color: #fff;
     border: none;
@@ -45,33 +70,14 @@
     padding: 4px 6px;
     cursor: pointer;
   }
-  .controls {
-    margin: 10px auto;
-  }
-  .controls button {
-    cursor: pointer;
-    border: 0;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin: 0 6px;
-    background: #0d6efd;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
-  .controls button:hover {
-    background: #0b5ed7;
-  }
 </style>
 </head>
 <body>
-<header>
-  <h2>Vue et Contrôle côte à côte (30 % / 70 %)</h2>
-</header>
 
 <div class="controls">
-  <button onclick="showView()">Afficher Vue</button>
-  <button onclick="showControl()">Afficher Contrôle</button>
-  <button onclick="showBoth()">Afficher les deux</button>
+  <button onclick="showView()">Vue</button>
+  <button onclick="showControl()">Contrôle</button>
+  <button onclick="showBoth()">Les deux</button>
 </div>
 
 <main id="container"></main>
@@ -90,16 +96,30 @@ function createPane(url, widthPercent, id) {
   div.style.width = widthPercent + "%";
   div.id = id;
 
-  const btn = document.createElement("button");
-  btn.className = "close-btn";
-  btn.innerText = "✕";
-  btn.onclick = () => div.remove();
-
   const iframe = document.createElement("iframe");
   iframe.src = url;
 
-  div.appendChild(btn);
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "close-btn";
+  closeBtn.innerText = "✕";
+  closeBtn.onclick = () => div.remove();
+
+  const zoomBox = document.createElement("div");
+  zoomBox.className = "zoom";
+  const zoomInput = document.createElement("input");
+  zoomInput.type = "range";
+  zoomInput.min = "50";
+  zoomInput.max = "150";
+  zoomInput.value = "100";
+  zoomInput.oninput = () => {
+    const scale = zoomInput.value / 100;
+    iframe.style.transform = `scale(${scale})`;
+  };
+
+  zoomBox.appendChild(zoomInput);
+  div.appendChild(closeBtn);
   div.appendChild(iframe);
+  div.appendChild(zoomBox);
   document.getElementById("container").appendChild(div);
 }
 
