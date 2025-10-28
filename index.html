@@ -3,46 +3,133 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Popups côte à côte</title>
+<title>Vue & Contrôle côte à côte</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;padding:24px;background:#f6f7fb;text-align:center}
-  h1{font-size:18px;margin-bottom:16px}
-  button{
-    cursor:pointer;border:0;border-radius:8px;padding:10px 14px;
-    background:#0d6efd;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15);margin:8px;
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background: #f6f7fb;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
   }
-  button:hover{background:#0b5ed7}
+
+  header {
+    padding: 8px;
+    background: #0d6efd;
+    color: #fff;
+    text-align: center;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    width: 100%;
+  }
+
+  .pane {
+    position: relative;
+    height: 100%;
+  }
+
+  .pane iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 4px 6px;
+    cursor: pointer;
+  }
+
+  .controls {
+    margin: 10px auto;
+  }
+
+  .controls button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 0 6px;
+    background: #0d6efd;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .controls button:hover {
+    background: #0b5ed7;
+  }
 </style>
 </head>
 <body>
-  <h1>Ouvrir les deux popups côte à côte</h1>
-  <button onclick="openBoth()">Ouvrir Vue + Contrôle</button>
+
+<header>
+  <h2>Vue et Contrôle côte à côte (30 % / 70 %)</h2>
+</header>
+
+<div class="controls">
+  <button onclick="showView()">Afficher Vue</button>
+  <button onclick="showControl()">Afficher Contrôle</button>
+  <button onclick="showBoth()">Afficher les deux</button>
+</div>
+
+<main id="container">
+  <!-- Les iframes seront insérées ici -->
+</main>
 
 <script>
 const URL_VIEW = "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/view/5VL1HVS4";
 const URL_CONTROL = "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/presenter/control/1";
 
-// Taille par défaut des popups
-const W = 900;
-const H = 800;
+function clearContainer() {
+  document.getElementById("container").innerHTML = "";
+}
 
-function openBoth() {
-  const sw = screen.availWidth;
-  const sh = screen.availHeight;
-  const top = Math.round((sh - H) / 2);
-  const left1 = Math.round((sw / 2) - W - 10);
-  const left2 = Math.round((sw / 2) + 10);
+function createPane(url, widthPercent, id) {
+  const div = document.createElement("div");
+  div.className = "pane";
+  div.style.width = widthPercent + "%";
+  div.id = id;
 
-  const features1 = `width=${W},height=${H},top=${top},left=${left1},resizable=yes,scrollbars=yes`;
-  const features2 = `width=${W},height=${H},top=${top},left=${left2},resizable=yes,scrollbars=yes`;
+  const btn = document.createElement("button");
+  btn.className = "close-btn";
+  btn.innerText = "✕";
+  btn.onclick = () => div.remove();
 
-  const p1 = window.open(URL_VIEW, "popupView", features1);
-  const p2 = window.open(URL_CONTROL, "popupControl", features2);
+  const iframe = document.createElement("iframe");
+  iframe.src = url;
 
-  if (!p1 || !p2) {
-    alert("Autorisez les popups pour ce site.");
-  }
+  div.appendChild(btn);
+  div.appendChild(iframe);
+  document.getElementById("container").appendChild(div);
+}
+
+function showView() {
+  clearContainer();
+  createPane(URL_VIEW, 100, "viewPane");
+}
+
+function showControl() {
+  clearContainer();
+  createPane(URL_CONTROL, 100, "controlPane");
+}
+
+function showBoth() {
+  clearContainer();
+  createPane(URL_VIEW, 30, "viewPane");
+  createPane(URL_CONTROL, 70, "controlPane");
 }
 </script>
+
 </body>
 </html>
