@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Vue & Contrôle</title>
+<title>Vue & Contrôle côte à côte</title>
 <style>
   body {
     margin: 0;
@@ -11,25 +11,6 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-  }
-  .controls {
-    background: #0d6efd;
-    padding: 5px;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-  }
-  .controls button {
-    border: none;
-    border-radius: 4px;
-    background: #fff;
-    color: #0d6efd;
-    font-size: 12px;
-    padding: 6px 10px;
-    cursor: pointer;
-  }
-  .controls button:hover {
-    background: #e9ecef;
   }
   main {
     flex: 1;
@@ -45,6 +26,7 @@
     height: 100%;
     border: none;
     transform-origin: center center;
+    transition: transform 0.2s ease;
   }
   .zoom {
     position: absolute;
@@ -74,12 +56,6 @@
 </head>
 <body>
 
-<div class="controls">
-  <button onclick="showView()">Vue</button>
-  <button onclick="showControl()">Contrôle</button>
-  <button onclick="showBoth()">Les deux</button>
-</div>
-
 <main id="container"></main>
 
 <script>
@@ -90,7 +66,7 @@ function clearContainer() {
   document.getElementById("container").innerHTML = "";
 }
 
-function createPane(url, widthPercent, id) {
+function createPane(url, widthPercent, id, initialZoom = 100) {
   const div = document.createElement("div");
   div.className = "pane";
   div.style.width = widthPercent + "%";
@@ -98,6 +74,7 @@ function createPane(url, widthPercent, id) {
 
   const iframe = document.createElement("iframe");
   iframe.src = url;
+  iframe.style.transform = `scale(${initialZoom / 100})`;
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-btn";
@@ -110,7 +87,7 @@ function createPane(url, widthPercent, id) {
   zoomInput.type = "range";
   zoomInput.min = "50";
   zoomInput.max = "150";
-  zoomInput.value = "100";
+  zoomInput.value = initialZoom;
   zoomInput.oninput = () => {
     const scale = zoomInput.value / 100;
     iframe.style.transform = `scale(${scale})`;
@@ -123,21 +100,12 @@ function createPane(url, widthPercent, id) {
   document.getElementById("container").appendChild(div);
 }
 
-function showView() {
-  clearContainer();
-  createPane(URL_VIEW, 100, "viewPane");
-}
-
-function showControl() {
-  clearContainer();
-  createPane(URL_CONTROL, 100, "controlPane");
-}
-
-function showBoth() {
-  clearContainer();
-  createPane(URL_VIEW, 30, "viewPane");
-  createPane(URL_CONTROL, 70, "controlPane");
-}
+// --- Affichage automatique des deux au chargement ---
+window.onload = function() {
+  createPane(URL_VIEW, 30, "viewPane", 80);  // gauche dézoomée
+  createPane(URL_CONTROL, 70, "controlPane", 100); // droite normale
+};
 </script>
+
 </body>
 </html>
